@@ -1,19 +1,63 @@
 package com.example.tr.musicparty;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity implements MainMenu.OnFragmentInteractionListener,
+    JoinView.OnFragmentInteractionListener{
 
+    protected FragmentManager fragmentManager;
+    protected FragmentTransaction fragmentTransaction;
+    private static final int REQUEST_ENABLE_BT = 1;
+    boolean temp=false;
+
+    /***************************************************************************************************
+    *
+    * `                                         On Create
+    *
+    **************************************************************************************************/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        
+        fragmentManager = getFragmentManager();
+        fragmentTransaction = fragmentManager.beginTransaction();
+
+        MainMenu mainMenu = new MainMenu();
+        fragmentTransaction.add(R.id.FragmentHolder, mainMenu);
+        fragmentTransaction.commit();
+
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();//Declare and get Adapter
+        if(mBluetoothAdapter == null){//checks if bluetooth adapter is supported
+             temp =true;
+        }
+
+       else if (!mBluetoothAdapter.isEnabled()||temp){//checks if bluetooth is off
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+    }
+    /***************************************************************************************************
+     *
+     * `                                         join server
+     *
+     **************************************************************************************************/
+    protected void joinServer(View view){
+
+        JoinView joinView = new JoinView();
+        fragmentTransaction.add(R.id.FragmentHolder, joinView);
+        fragmentTransaction.commit();
+
     }
 
 
@@ -37,5 +81,15 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    //@Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onFragmentInteraction(String id) {
+
     }
 }
